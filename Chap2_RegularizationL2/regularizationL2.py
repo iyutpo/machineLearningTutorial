@@ -92,8 +92,8 @@ X_scaled = columnof1.copy()
 
 for i in range(1, n+1):
   mean = sum(X[:, i]) / m
-  rangex = max(X[:, i]) - min(X[:, i])
-  X_scaled = np.concatenate((X_scaled, ((X[:, i] - mean) / rangex).reshape(m, 1)), 1 )
+  std = np.std(X[:, i])
+  X_scaled = np.concatenate((X_scaled, ((X[:, i] - mean) / std).reshape(m, 1)), 1 )
 
 
 def h(theta, X):
@@ -128,7 +128,7 @@ def graddescent(theta, X, y, factor, alpha): ## alpha is the learning rate
 #  return numgrad
 
 
-factor = 10
+factor = 5
 alpha = 0.05
 iternum = 1000
 #yy = []
