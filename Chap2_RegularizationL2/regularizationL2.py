@@ -1,4 +1,4 @@
-## data 
+## data source: https://online.stat.psu.edu/stat462/node/177/
 ## Pt	BP	Age	Weight	BSA	Dur	Pulse	Stress
 ## 1	105	47	85.4	1.75	5.1	63	33
 ## 2	115	49	94.2	2.10	3.8	70	14
