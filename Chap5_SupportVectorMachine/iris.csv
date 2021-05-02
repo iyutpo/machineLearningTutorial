@@ -19,6 +19,7 @@
 5.7,3.8,Iris-setosa
 5.1,3.8,Iris-setosa
 5.4,3.4,Iris-setosa
+4.5,2.3,Iris-setosa
 5.1,3.7,Iris-setosa
 4.6,3.6,Iris-setosa
 5.1,3.3,Iris-setosa
@@ -39,7 +40,6 @@
 4.4,3,Iris-setosa
 5.1,3.4,Iris-setosa
 5,3.5,Iris-setosa
-4.5,2.3,Iris-setosa
 4.4,3.2,Iris-setosa
 5,3.5,Iris-setosa
 5.1,3.8,Iris-setosa
