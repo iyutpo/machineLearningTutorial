@@ -3,7 +3,7 @@ import zipfile
 from PIL import Image
 import numpy as np
 
-base_dir = 'cats_and_dogs_filtered'
+base_dir = 'tmp/cats_and_dogs_filtered'
 train_dir = os.path.join(base_dir, 'train')
 validation_dir = os.path.join(base_dir, 'validation')
 
@@ -19,139 +19,49 @@ train_dog_fnames.sort()
 
 
 
-image = np.array(Image.open(os.path.join(train_cats_dir, train_cat_fnames[1]) ))
-imagetest = np.zeros((1024, 1024, 3))
-imagetest[:image.shape[0], :image.shape[1], :] = image
-print(imagetest)
+imagetest = np.zeros((2, 1024, 1024, 3))
+for i in range(2):
+  image = np.array(Image.open(os.path.join(train_cats_dir, train_cat_fnames[i]) )) / 255.0
+#  imagetest[i, int((imagetest.shape[0] - image.shape[0]) / 2):image.shape[0] + int((imagetest.shape[0] - image.shape[0]) / 2), int((imagetest.shape[1] - image.shape[1]) / 2) :image.shape[1] + int((imagetest.shape[1] - image.shape[1]) / 2), :] = image
+  imagetest[i, :image.shape[0], :image.shape[1], :] = image
 
-
-
-
-#from tensorflow.keras.preprocessing.image import ImageDataGenerator
-#
-## All images will be rescaled by 1./255
-#train_datagen = ImageDataGenerator(rescale=1./255)
-#val_datagen = ImageDataGenerator(rescale=1./255)
-#
-## Flow training images in batches of 20 using train_datagen generator
-#train_generator = train_datagen.flow_from_directory(
-#        train_dir,  # This is the source directory for training images
-#        target_size=(150, 150),  # All images will be resized to 150x150
-#        batch_size=20,
-#        # Since we use binary_crossentropy loss, we need binary labels
-#        class_mode='binary')
-#
-## Flow validation images in batches of 20 using val_datagen generator
-#validation_generator = val_datagen.flow_from_directory(
-#        validation_dir,
-#        target_size=(150, 150),
-#        batch_size=20,
-#        class_mode='binary')
-#
-#print(train_generator)
-
-
-
-
-
-##import matplotlib.pyplot as plt
-##import matplotlib.image as mpimg
-### Parameters for our graph; we'll output images in a 4x4 configuration
-##nrows = 4
-##ncols = 4
-##
-### Index for iterating over images
-##pic_index = 0
-##
-##fig = plt.gcf()
-##fig.set_size_inches(ncols * 4, nrows * 4)
-##
-##pic_index += 8
-##next_cat_pix = [os.path.join(train_cats_dir, fname) 
-##                for fname in train_cat_fnames[pic_index-8:pic_index]]
-##next_dog_pix = [os.path.join(train_dogs_dir, fname) 
-##                for fname in train_dog_fnames[pic_index-8:pic_index]]
-##
-##for i, img_path in enumerate(next_cat_pix+next_dog_pix):
-##  # Set up subplot; subplot indices start at 1
-##  sp = plt.subplot(nrows, ncols, i + 1)
-##  sp.axis('Off') # Don't show axes (or gridlines)
-##
-##  img = mpimg.imread(img_path)
-##  plt.imshow(img)
-##
-##plt.show()
-#
-#from tensorflow.keras import layers
-#from tensorflow.keras import Model
-#
-## Our input feature map is 150x150x3: 150x150 for the image pixels, and 3 for
-## the three color channels: R, G, and B
-#img_input = layers.Input(shape=(150, 150, 3))
-#
+from cnnfunc_stepbystep import *
 ## First convolution extracts 16 filters that are 3x3
 ## Convolution is followed by max-pooling layer with a 2x2 window
-#x = layers.Conv2D(16, 3, activation='relu')(img_input)
-#x = layers.MaxPooling2D(2)(x)
-#
+W1 = np.ones((3, 3, 3, 16))
+b1 = np.ones((1, 1, 1, 16))
+hparameters = {'stride': 1, 'pad': 0}
+Z1, cache11 = conv_forward(imagetest, W1, b1, hparameters)
+
+hparameters = {'stride': 1, 'f': 2}
+A1, cache12 = pool_forward(Z1, hparameters, mode = "max")
+
 ## Second convolution extracts 32 filters that are 3x3
 ## Convolution is followed by max-pooling layer with a 2x2 window
-#x = layers.Conv2D(32, 3, activation='relu')(x)
-#x = layers.MaxPooling2D(2)(x)
-#
+hparameters = {'stride': 1, 'pad': 0}
+W2 = np.ones((3, 3, 16, 32))
+b2 = np.ones((1, 1, 1, 32))
+Z2, cache21 = conv_forward(A1, W2, b2, hparameters)
+hparameters = {'stride': 1, 'f': 2}
+A2, cache22 = pool_forward(Z2, hparameters, mode = "max")
+
 ## Third convolution extracts 64 filters that are 3x3
 ## Convolution is followed by max-pooling layer with a 2x2 window
-#x = layers.Conv2D(64, 3, activation='relu')(x)
-#x = layers.MaxPooling2D(2)(x)
-#
-#
-## Flatten feature map to a 1-dim tensor so we can add fully connected layers
-#x = layers.Flatten()(x)
-#
-## Create a fully connected layer with ReLU activation and 512 hidden units
-#x = layers.Dense(512, activation='relu')(x)
-#
-## Create output layer with a single node and sigmoid activation
-#output = layers.Dense(1, activation='sigmoid')(x)
-#
-## Create model:
-## input = input feature map
-## output = input feature map + stacked convolution/maxpooling layers + fully 
-## connected layer + sigmoid output layer
-#model = Model(img_input, output)
-#
-#model.summary()
-#
-#
-#from tensorflow.keras.optimizers import RMSprop
-#
-#model.compile(loss='binary_crossentropy',
-#              optimizer=RMSprop(lr=0.001),
-#              metrics=['acc'])
-#
+hparameters = {'stride': 1, 'pad': 0}
+W3 = np.ones((3, 3, 32, 64))
+b3 = np.ones((1, 1, 1, 64))
+Z3, cache31 = conv_forward(A2, W3, b3, hparameters)
+hparameters = {'stride': 1, 'f': 2}
+A3, cache32 = pool_forward(Z3, hparameters, mode = "max")
 
-#import numpy as np
-#import random
-#from tensorflow.keras.preprocessing.image import img_to_array, load_img
-#
-## Let's define a new Model that will take an image as input, and will output
-## intermediate representations for all layers in the previous model after
-## the first.
-#successive_outputs = [layer.output for layer in model.layers[1:]]
-#visualization_model = Model(img_input, successive_outputs)
-#
-## Let's prepare a random input image of a cat or dog from the training set.
-#cat_img_files = [os.path.join(train_cats_dir, f) for f in train_cat_fnames]
-#dog_img_files = [os.path.join(train_dogs_dir, f) for f in train_dog_fnames]
-#img_path = random.choice(cat_img_files + dog_img_files)
-#
-#img = load_img(img_path, target_size=(150, 150))  # this is a PIL image
-#x = img_to_array(img)  # Numpy array with shape (150, 150, 3)
-#x = x.reshape((1,) + x.shape)  # Numpy array with shape (1, 150, 150, 3)
-#
-## Rescale by 1/255
-#x /= 255
-#
+
+## Flatten feature map to a 1-dim tensor so we can add fully connected layers
+## Create a fully connected layer with ReLU activation and 512 hidden units
+
+## Create output layer with a single node and sigmoid activation
+
+
+
 ## Let's run our image through our network, thus obtaining all
 ## intermediate representations for this image.
 #successive_feature_maps = visualization_model.predict(x)
