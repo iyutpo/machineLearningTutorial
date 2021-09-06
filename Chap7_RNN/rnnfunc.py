@@ -2,8 +2,11 @@ import numpy as np
 from math import e
 
 def softmax(x):
-  denominator = np.sum(np.exp(x))
-  return np.exp(x) / denominator
+  e_x = np.exp(x - np.max(x))
+  return e_x / e_x.sum(axis=0)
+
+#  denominator = np.sum(np.exp(x))
+#  return np.exp(x) / denominator
 
 def sigmoid(x):
   return 1 / (1 + np.exp(-x))
@@ -55,7 +58,8 @@ def lstm_cell_forward(xt, a_prev, c_prev, parameters):
   n_x, m = xt.shape
   n_y, n_a = Wy.shape
 
-  concat = np.random.randn(n_a + n_x, m)
+  concat = np.zeros([n_x+n_a, m])
+#  concat = np.random.randn(n_a + n_x, m)
   concat[: n_a, :] = a_prev
   concat[n_a: , :] = xt
 
